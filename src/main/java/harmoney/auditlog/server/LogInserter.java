@@ -27,7 +27,7 @@ public class LogInserter extends Thread implements Runnable{
 		StringTokenizer tokenizer = new StringTokenizer(message,":");
 		al.setTime(Long.parseLong(tokenizer.nextToken()));
 		al.setUser(tokenizer.nextToken());
-		al.setBranchName(tokenizer.nextToken());
+		al.setBranch(tokenizer.nextToken());
 		al.setMessage(tokenizer.nextToken());
 		al.setStatus(tokenizer.nextToken());
 		repo.save(al);

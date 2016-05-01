@@ -71,12 +71,12 @@ public class AuditLogController {
     	
     	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
     		System.out.println("Specific User and Specific Branch Case (teller)");
-    		Criteria b = Criteria.where("branchId").is(branchName).andOperator(Criteria.where("user").is(user));
+    		Criteria b = Criteria.where("branch").is(branchName).andOperator(Criteria.where("user").is(user));
     		c.andOperator(b);
     	}
     	else if(!"ALL".equals(branchName)){
     		System.out.println("Specific Branch Case (manager)");
-    		Criteria u = Criteria.where("branchId").is(branchName);
+    		Criteria u = Criteria.where("branch").is(branchName);
     		c.andOperator(u);
     	}else{
     		System.out.println("All Case (sadmin)");

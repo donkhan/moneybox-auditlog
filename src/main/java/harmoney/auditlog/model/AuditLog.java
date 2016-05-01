@@ -10,13 +10,13 @@ public class AuditLog {
     private long time;
     private String user;
     private String message;
-    private String branchName;
-    public String getBranchName() {
-		return branchName;
+    private String branch;
+    public String getBranch() {
+		return branch;
 	}
 
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
+	public void setBranch(String branchName) {
+		this.branch = branchName;
 	}
 
 	private String status;
@@ -64,6 +64,6 @@ public class AuditLog {
 	}
 
 	public String toString(){
-		return "Time " + time + " Message " + message + " Status " + status + " Branch Name " + branchName + " User " + user;
+		return "Time " + time + " Message " + message + " Status " + status + " Branch  " + branch + " User " + user;
 	}
 }
