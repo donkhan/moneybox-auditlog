@@ -2,6 +2,7 @@ package harmoney.auditlog.web;
 
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.Page;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
@@ -38,14 +39,41 @@ public class AuditLogController {
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
     	System.out.println("Get Audit Logs");
-    	Query query = new Query();
-    	query.addCriteria(Criteria.where("branchId").is(Integer.parseInt(request.getParameter("branch"))));
-    	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
+    	Query query = getQuery(request);
     	
-    	//List<AuditLog> result = auditLogRepository.findAll();
+    	long count = mongoTemplate.count(query, AuditLog.class);
+    	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
+    	Page page = createPage(count,result);
+    	
     	System.out.println("No of Entries " + result.size());
-    	return Response.ok().entity(result).header("Access-Control-Allow-Origin", "*")
+    	return Response.ok().entity(page).header("Access-Control-Allow-Origin", "*")
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
+    }
+    
+    private Page createPage(long total,List<AuditLog> result){
+    	Page page = new Page();
+    	page.setTotal(total);
+    	page.setContent(result);
+    	return page;
+    }
+    
+    private Query getQuery(HttpServletRequest request){
+    	Query query = new Query();
+    	int branchId = Integer.parseInt(request.getParameter("branch"));
+    	long from = Long.parseLong(request.getParameter("from"));
+    	long to = Long.parseLong(request.getParameter("to"));
+    	String user = request.getParameter("user");
+    	Criteria c = Criteria.where("time").gte(from).lte(to);
+    	if(branchId != -1){
+    		Criteria b = Criteria.where("branchId").is(branchId);
+    		c.andOperator(b);
+    	}
+    	if("ALL".equals(user)){
+    		Criteria u = Criteria.where("user").is(user);
+    		c.andOperator(u);
+    	}
+    	//query.addCriteria(c);
+    	return query;
     }
 
 }
