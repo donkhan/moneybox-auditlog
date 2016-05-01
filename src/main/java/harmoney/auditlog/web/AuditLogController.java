@@ -64,15 +64,24 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	if(branchId != -1){
-    		Criteria b = Criteria.where("branchId").is(branchId);
+    	System.out.println("From " + from + " To " + to);
+    	System.out.println("User " + user + " Branch ID " + branchId);
+    	
+    	if(branchId != -1 && !"ALL".equals(user)){
+    		System.out.println("Specific User and Specific Branch Case (teller)");
+    		Criteria b = Criteria.where("branchId").is(branchId).andOperator(Criteria.where("user").is(user));
     		c.andOperator(b);
     	}
-    	if("ALL".equals(user)){
-    		Criteria u = Criteria.where("user").is(user);
+    	else if(branchId != -1){
+    		System.out.println("Specific Branch Case (manager)");
+    		Criteria u = Criteria.where("branchId").is(branchId);
     		c.andOperator(u);
+    	}else{
+    		System.out.println("All Case (sadmin)");
     	}
-    	//query.addCriteria(c);
+    	
+    	
+    	query.addCriteria(c);
     	return query;
     }
 
