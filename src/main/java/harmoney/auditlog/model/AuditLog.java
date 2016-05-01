@@ -10,8 +10,16 @@ public class AuditLog {
     private long time;
     private String user;
     private String message;
-    private long branchId;
-    private String status;
+    private String branchName;
+    public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+
+	private String status;
 
     public AuditLog() {}
 
@@ -47,14 +55,6 @@ public class AuditLog {
 		this.message = message;
 	}
 
-	public long getBranchId() {
-		return branchId;
-	}
-
-	public void setBranchId(long branchId) {
-		this.branchId = branchId;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -64,6 +64,6 @@ public class AuditLog {
 	}
 
 	public String toString(){
-		return "Time " + time + " Message " + message + " Status " + status + " Branch ID " + branchId + " User " + user;
+		return "Time " + time + " Message " + message + " Status " + status + " Branch Name " + branchName + " User " + user;
 	}
 }

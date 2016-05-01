@@ -1,3 +1,4 @@
+
 package harmoney.auditlog.web;
 
 
@@ -29,6 +30,7 @@ public class AuditLogController {
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
     }
     
+    
     @Autowired
 	private AuditLogRepository auditLogRepository;
     
@@ -59,22 +61,22 @@ public class AuditLogController {
     
     private Query getQuery(HttpServletRequest request){
     	Query query = new Query();
-    	int branchId = Integer.parseInt(request.getParameter("branch"));
+    	String branchName = request.getParameter("branch");
     	long from = Long.parseLong(request.getParameter("from"));
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
     	System.out.println("From " + from + " To " + to);
-    	System.out.println("User " + user + " Branch ID " + branchId);
+    	System.out.println("User " + user + " Branch Name " + branchName);
     	
-    	if(branchId != -1 && !"ALL".equals(user)){
+    	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
     		System.out.println("Specific User and Specific Branch Case (teller)");
-    		Criteria b = Criteria.where("branchId").is(branchId).andOperator(Criteria.where("user").is(user));
+    		Criteria b = Criteria.where("branchId").is(branchName).andOperator(Criteria.where("user").is(user));
     		c.andOperator(b);
     	}
-    	else if(branchId != -1){
+    	else if(!"ALL".equals(branchName)){
     		System.out.println("Specific Branch Case (manager)");
-    		Criteria u = Criteria.where("branchId").is(branchId);
+    		Criteria u = Criteria.where("branchId").is(branchName);
     		c.andOperator(u);
     	}else{
     		System.out.println("All Case (sadmin)");
