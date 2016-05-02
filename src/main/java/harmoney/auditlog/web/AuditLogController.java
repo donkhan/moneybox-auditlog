@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -46,8 +47,6 @@ public class AuditLogController {
     public Response getAuditLogs(HttpServletRequest request){
     	logger.info("Get Audig Logs called");
     	Query query = getQuery(request);
-    	int pageNo = Integer.parseInt(request.getParameter("pageNo"));
-    	int pageSize = Integer.parseInt(request.getParameter("pageSize"));
     	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
@@ -72,24 +71,33 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	logger.info("From {} To {}", from , to);
-    	logger.info("User {} Branch {} ", user, branchName);
+    	logger.trace("From {} To {}", from , to);
+    	logger.trace("User {} Branch {} ", user, branchName);
     	
     	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
-    		logger.info("Specific User and Specific Branch Case (teller)");
+    		logger.trace("Specific User and Specific Branch Case (teller)");
     		Criteria b = Criteria.where("branch").is(branchName).andOperator(Criteria.where("user").is(user));
     		c.andOperator(b);
     	}
     	else if(!"ALL".equals(branchName)){
-    		logger.info("Specific Branch Case (manager)");
+    		logger.trace("Specific Branch Case (manager)");
     		Criteria u = Criteria.where("branch").is(branchName);
     		c.andOperator(u);
     	}else{
-    		logger.info("All Case (sadmin)");
+    		logger.trace("All Case (sadmin)");
     	}
     	query.addCriteria(c);
     	query.with(new Sort(new Order(Direction.DESC, "time")));
+    	
+    	int pageNo = Integer.parseInt(request.getParameter("pageNo"));
+    	int pageSize = Integer.parseInt(request.getParameter("pageSize"));
+    	logger.info("Page No {}, Page Size {}",pageNo,pageSize);
+    	
+    	PageRequest pageRequest = new PageRequest(pageNo,pageSize);
+    	query.with(pageRequest);
+    	
     	return query;
     }
-
+    
+    
 }

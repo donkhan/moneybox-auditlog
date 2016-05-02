@@ -24,7 +24,6 @@ public class AuditServer {
 			for (;;) {
 				DatagramPacket packet = new DatagramPacket(	new byte[PACKETSIZE], PACKETSIZE);
 				socket.receive(packet);
-				//socket.send(packet);
 				LogInserter li = new LogInserter(this.auditLogRepo,packet);
 				li.start();
 			}
