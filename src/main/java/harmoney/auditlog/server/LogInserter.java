@@ -3,9 +3,10 @@ package harmoney.auditlog.server;
 import harmoney.auditlog.model.AuditLog;
 import harmoney.auditlog.repository.AuditLogRepository;
 
-import java.net.DatagramPacket;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,22 +14,33 @@ import org.slf4j.LoggerFactory;
 public class LogInserter extends Thread implements Runnable{
 	
 	private AuditLogRepository repo;
-	private String message;
 	final Logger logger = LoggerFactory.getLogger(LogInserter.class);
+	private List<String> messageList;
 	
-	public LogInserter(AuditLogRepository repo,DatagramPacket packet){
-		String message = new String(packet.getData());
-		logger.trace("Address {} Port {} Message {}",packet.getAddress(), packet.getPort(), message);
+	public LogInserter(AuditLogRepository repo,List<String> messageList){
 		this.repo = repo;
-		this.message = message.trim();
+		this.messageList = messageList;
 	}
 	
 	@Override
 	public void run() {
-		log(this.message);
+		while(true){
+			if(messageList.size() == 0){
+				logger.info("Since Message List is empty i am going to sleep for 5 seconds");
+				try {
+					Thread.sleep(5*1000);
+				} catch (InterruptedException e) {
+					logger.error("Error {}",e);
+				}
+			}else{
+				log(messageList.remove(0));
+			}
+		}
+		
 	}
 	
 	private void log(String message){
+		logger.info("Going to Log {} ",message);
 		AuditLog al = new AuditLog();
 		al.setId(UUID.randomUUID().toString());
 		StringTokenizer tokenizer = new StringTokenizer(message,":");
