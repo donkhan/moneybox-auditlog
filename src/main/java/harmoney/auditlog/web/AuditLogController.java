@@ -1,6 +1,4 @@
-
 package harmoney.auditlog.web;
-
 
 import harmoney.auditlog.model.AuditLog;
 import harmoney.auditlog.model.Page;
@@ -11,7 +9,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuditLogController {
 
+	final Logger logger = LoggerFactory.getLogger(AuditLogController.class);
     @RequestMapping("/")
     @CrossOrigin
     public Response index() {
@@ -40,14 +44,16 @@ public class AuditLogController {
     @RequestMapping("/get-audit-logs")
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
-    	System.out.println("Get Audit Logs");
+    	logger.info("Get Audig Logs called");
     	Query query = getQuery(request);
+    	int pageNo = Integer.parseInt(request.getParameter("pageNo"));
+    	int pageSize = Integer.parseInt(request.getParameter("pageSize"));
     	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
     	Page page = createPage(count,result);
     	
-    	System.out.println("No of Entries " + result.size());
+    	logger.info("No of Entries {} " ,count);
     	return Response.ok().entity(page).header("Access-Control-Allow-Origin", "*")
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
     }
@@ -66,24 +72,23 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	System.out.println("From " + from + " To " + to);
-    	System.out.println("User " + user + " Branch Name " + branchName);
+    	logger.info("From {} To {}", from , to);
+    	logger.info("User {} Branch {} ", user, branchName);
     	
     	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
-    		System.out.println("Specific User and Specific Branch Case (teller)");
+    		logger.info("Specific User and Specific Branch Case (teller)");
     		Criteria b = Criteria.where("branch").is(branchName).andOperator(Criteria.where("user").is(user));
     		c.andOperator(b);
     	}
     	else if(!"ALL".equals(branchName)){
-    		System.out.println("Specific Branch Case (manager)");
+    		logger.info("Specific Branch Case (manager)");
     		Criteria u = Criteria.where("branch").is(branchName);
     		c.andOperator(u);
     	}else{
-    		System.out.println("All Case (sadmin)");
+    		logger.info("All Case (sadmin)");
     	}
-    	
-    	
     	query.addCriteria(c);
+    	query.with(new Sort(new Order(Direction.DESC, "time")));
     	return query;
     }
 
