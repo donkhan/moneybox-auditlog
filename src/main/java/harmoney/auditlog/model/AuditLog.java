@@ -11,7 +11,17 @@ public class AuditLog {
     private String user;
     private String message;
     private String branch;
-    public String getBranch() {
+    private String module;
+    
+    public String getModule() {
+		return module;
+	}
+
+	public void setModule(String module) {
+		this.module = module;
+	}
+
+	public String getBranch() {
 		return branch;
 	}
 

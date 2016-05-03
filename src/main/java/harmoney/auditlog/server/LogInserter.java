@@ -6,7 +6,6 @@ import harmoney.auditlog.repository.AuditLogRepository;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ public class LogInserter extends Thread implements Runnable{
 		al.setTime(Long.parseLong(tokenizer.nextToken()));
 		al.setUser(tokenizer.nextToken());
 		al.setBranch(tokenizer.nextToken());
+		al.setModule(tokenizer.nextToken());
 		al.setMessage(tokenizer.nextToken());
 		al.setStatus(tokenizer.nextToken());
 		repo.save(al);
