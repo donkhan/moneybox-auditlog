@@ -7,15 +7,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import crawl.DClient;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest extends TestCase {
+public class AppTest {
 	protected void syslog(String user, String message, String status) {
 		for (int i = 0; i < 1000; i++) {
 			System.out.println("Going to send SysLog");
@@ -43,6 +39,6 @@ public class AppTest extends TestCase {
 	}
 
 	public static void main(String args[]) {
-		new DClient().syslog("KHAN", "Logged In", "SUCCESS");
+		new AppTest().syslog("KHAN", "Logged In", "SUCCESS");
 	}
 }
