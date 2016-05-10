@@ -53,7 +53,7 @@ public class AuditLogController {
     		return Response.serverError().build();
     	}
     	String message = System.currentTimeMillis() + ":" + requesterName + ":" 
-    			+ requesterBranchName + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "AUDITLOG";
+    			+ requesterBranchName + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "SUCCESS";
     	AuditLog auditLog = AuditLog.getLog(message);
     	Query query = getQuery(request);
     	auditLogRepository.save(auditLog);
