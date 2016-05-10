@@ -52,9 +52,11 @@ public class AuditLogController {
     		logger.error("Unable to serve as requester's name {} and branch Name {} ",requesterName,requesterBranchName );
     		return Response.serverError().build();
     	}
-    	
+    	String message = System.currentTimeMillis() + ":" + requesterName + ":" 
+    			+ requesterBranchName + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "AUDITLOG";
+    	AuditLog auditLog = AuditLog.getLog(message);
     	Query query = getQuery(request);
-    	auditLogRepository.save(AuditLog.getLog(""));
+    	auditLogRepository.save(auditLog);
     	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);

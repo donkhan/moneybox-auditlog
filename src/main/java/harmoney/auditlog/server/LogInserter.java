@@ -23,7 +23,7 @@ public class LogInserter extends Thread implements Runnable{
 	public void run() {
 		while(true){
 			if(messageList.size() == 0){
-				logger.info("Since Message List is empty i am going to sleep for 5 seconds");
+				logger.trace("Since Message List is empty i am going to sleep for 5 seconds");
 				try {
 					Thread.sleep(5*1000);
 				} catch (InterruptedException e) {
