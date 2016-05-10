@@ -4,8 +4,6 @@ import harmoney.auditlog.model.AuditLog;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,23 +30,9 @@ public class LogInserter extends Thread implements Runnable{
 					logger.error("Error {}",e);
 				}
 			}else{
-				log(messageList.remove(0));
+				repo.save(AuditLog.getLog((messageList.remove(0))));
 			}
 		}
-		
-	}
+	} 
 	
-	private void log(String message){
-		logger.info("Going to Log {} ",message);
-		AuditLog al = new AuditLog();
-		al.setId(UUID.randomUUID().toString());
-		StringTokenizer tokenizer = new StringTokenizer(message,":");
-		al.setTime(Long.parseLong(tokenizer.nextToken()));
-		al.setUser(tokenizer.nextToken());
-		al.setBranch(tokenizer.nextToken());
-		al.setModule(tokenizer.nextToken());
-		al.setMessage(tokenizer.nextToken());
-		al.setStatus(tokenizer.nextToken());
-		repo.save(al);
-	}
 }
