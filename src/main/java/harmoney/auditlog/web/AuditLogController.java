@@ -46,7 +46,15 @@ public class AuditLogController {
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
     	logger.info("Get Audig Logs called");
+    	String requesterBranchName = request.getParameter("requester-branch");
+    	String requesterName = request.getParameter("requester-name");
+    	if(requesterName == null || requesterBranchName == null){
+    		logger.error("Unable to serve as requester's name {} and branch Name {} ",requesterName,requesterBranchName );
+    		return Response.serverError().build();
+    	}
+    	
     	Query query = getQuery(request);
+    	auditLogRepository.save(AuditLog.getLog(""));
     	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
