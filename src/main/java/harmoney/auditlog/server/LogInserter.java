@@ -5,6 +5,9 @@ import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +22,7 @@ public class LogInserter extends Thread implements Runnable{
 		this.messageList = messageList;
 	}
 	
+	private JSONParser parser = new JSONParser();
 	@Override
 	public void run() {
 		while(true){
@@ -30,9 +34,34 @@ public class LogInserter extends Thread implements Runnable{
 					logger.error("Error {}",e);
 				}
 			}else{
-				repo.save(AuditLog.getLog((messageList.remove(0))));
+				repo.save(getLog(messageList.remove(0).trim()));
 			}
 		}
 	} 
 	
+	private AuditLog getLog(String message){
+		AuditLog auditLog = new AuditLog();
+		logger.error("Message {} ",message);
+		try {
+			JSONObject jsonObject = (JSONObject)parser.parse(message);
+			auditLog.setBranch(jsonObject.get("branch").toString());
+			auditLog.setMessage(jsonObject.get("message").toString());
+			auditLog.setModule(jsonObject.get("module").toString());
+			auditLog.setUser(jsonObject.get("user").toString());
+			auditLog.setStatus(jsonObject.get("status").toString());
+			auditLog.setTime(Long.parseLong(jsonObject.get("time").toString()));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		logger.error("{}",auditLog);
+		return auditLog;
+
+	}
+	/*
+	public static void main(String args[]){
+		String message = "{\"module\":\"TELLERTRANSFER\",\"time\":1462950297064,\"status\":\"SUCCESS\",\"branch\":\"MADURAI\",\"user\":\"KHAN\",\"message\":\" Junk TELLERTRANSFER\"}";
+		LogInserter li = new LogInserter(null,null);
+		AuditLog log = li.getLog(message);
+	}
+	*/
 }

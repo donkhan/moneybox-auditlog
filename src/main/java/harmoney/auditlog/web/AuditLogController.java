@@ -1,7 +1,9 @@
 package harmoney.auditlog.web;
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.LoggedInUser;
 import harmoney.auditlog.model.Page;
+import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
@@ -46,17 +48,18 @@ public class AuditLogController {
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
     	logger.info("Get Audig Logs called");
-    	String requesterBranchName = request.getParameter("requester-branch");
-    	String requesterName = request.getParameter("requester-name");
-    	if(requesterName == null || requesterBranchName == null){
-    		logger.error("Unable to serve as requester's name {} and branch Name {} ",requesterName,requesterBranchName );
+    	String sessionId = request.getParameter("session-id");
+    	SessionMap sessionMap = SessionMap.getSessionMap();
+    	if(!sessionMap.containsKey(sessionId)){
+    		logger.error("Unable to serve as session id {} is not present in Audit Log db",sessionId);
     		return Response.serverError().build();
     	}
-    	String message = System.currentTimeMillis() + ":" + requesterName + ":" 
-    			+ requesterBranchName + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "AUDITLOG";
-    	AuditLog auditLog = AuditLog.getLog(message);
+    	LoggedInUser user = sessionMap.get(sessionId);
+    	/*String message = System.currentTimeMillis() + ":" + user.getName() + ":" 
+    			+ user.getBranchName() + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "AUDITLOG";
+    	AuditLog auditLog = AuditLog.getLog(message);*/
     	Query query = getQuery(request);
-    	auditLogRepository.save(auditLog);
+    	//auditLogRepository.save(auditLog);
     	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);

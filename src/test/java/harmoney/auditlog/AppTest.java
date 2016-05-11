@@ -7,17 +7,28 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import org.json.simple.JSONObject;
+
 
 /**
  * Unit test for simple App.
  */
 public class AppTest {
+	@SuppressWarnings("unchecked")
 	protected void syslog(String user, String message, String status) {
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 1; i++) {
 			System.out.println("Going to send SysLog");
 			message = "MESSAGE " + i;
-			String syslogMessage = System.currentTimeMillis() + ":" + user
-					+ ":" + "MADURAI" + ":TELLERTRANSFER:" + message + ":" + status;
+			JSONObject sysLogPayLoad = new JSONObject();
+			sysLogPayLoad.put("time",System.currentTimeMillis());
+			sysLogPayLoad.put("user",user);
+			sysLogPayLoad.put("branch","MADURAI");
+			sysLogPayLoad.put("module","TELLERTRANSFER");
+			sysLogPayLoad.put("status",status);
+			sysLogPayLoad.put("message","HHAHA");
+			
+			String syslogMessage = sysLogPayLoad.toJSONString(); 
+			System.out.println("Syslog message " + syslogMessage);
 			try {
 				DatagramSocket clientSocket = new DatagramSocket();
 				InetAddress IPAddress = InetAddress.getByName("localhost");
