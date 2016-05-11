@@ -55,12 +55,8 @@ public class AuditLogController {
     		return Response.serverError().build();
     	}
     	LoggedInUser user = sessionMap.get(sessionId);
-    	/*String message = System.currentTimeMillis() + ":" + user.getName() + ":" 
-    			+ user.getBranchName() + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "AUDITLOG";
-    	AuditLog auditLog = AuditLog.getLog(message);*/
+    	log(user);
     	Query query = getQuery(request);
-    	//auditLogRepository.save(auditLog);
-    	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
     	Page page = createPage(count,result);
@@ -70,7 +66,18 @@ public class AuditLogController {
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
     }
     
-    private Page createPage(long total,List<AuditLog> result){
+    private void log(LoggedInUser user) {
+    	AuditLog auditLog = new AuditLog();
+    	auditLog.setBranch(user.getBranchName());
+    	auditLog.setUser(user.getName());
+    	auditLog.setTime(System.currentTimeMillis());
+    	auditLog.setModule("AUDIT LOG");
+    	auditLog.setStatus("SUCCESS");
+    	auditLog.setMessage("Retrieved Audit Logs");
+    	auditLogRepository.save(auditLog);
+	}
+
+	private Page createPage(long total,List<AuditLog> result){
     	Page page = new Page();
     	page.setTotal(total);
     	page.setContent(result);
@@ -84,8 +91,8 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	logger.trace("From {} To {}", from , to);
-    	logger.trace("User {} Branch {} ", user, branchName);
+    	logger.info("From {} To {}", from , to);
+    	logger.info("User {} Branch {} ", user, branchName);
     	
     	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
     		logger.trace("Specific User and Specific Branch Case (teller)");

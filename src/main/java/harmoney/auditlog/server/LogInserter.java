@@ -1,6 +1,8 @@
 package harmoney.auditlog.server;
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.LoggedInUser;
+import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
@@ -34,28 +36,53 @@ public class LogInserter extends Thread implements Runnable{
 					logger.error("Error {}",e);
 				}
 			}else{
-				repo.save(getLog(messageList.remove(0).trim()));
+				JSONObject jsonContent = getJSONObject(messageList.remove(0).trim());
+				if(jsonContent.get("message-type").toString().equals("LOG")){
+					logger.info("Log Message");
+					repo.save(getLog(jsonContent));
+				}
+				if(jsonContent.get("message-type").toString().equals("LOG IN")){
+					addToWhiteList(jsonContent);
+				}
+				if(jsonContent.get("message-type").toString().equals("LOG OUT")){
+					blackList(jsonContent);
+				}
 			}
 		}
 	} 
 	
-	private AuditLog getLog(String message){
-		AuditLog auditLog = new AuditLog();
-		logger.error("Message {} ",message);
+	private void addToWhiteList(JSONObject jsonContent) {
+		LoggedInUser lu = new LoggedInUser();
+		lu.setBranchName((String)jsonContent.get("branch"));
+		lu.setName((String)jsonContent.get("user"));
+		String sessionId = (String)jsonContent.get("session-id");
+		SessionMap.getSessionMap().put(sessionId, lu);
+	}
+	
+	private void blackList(JSONObject jsonContent) {
+		String sessionId = (String)jsonContent.get("session-id");
+		SessionMap.getSessionMap().remove(sessionId);
+	}
+
+	private JSONObject getJSONObject(String message){
 		try {
 			JSONObject jsonObject = (JSONObject)parser.parse(message);
-			auditLog.setBranch(jsonObject.get("branch").toString());
-			auditLog.setMessage(jsonObject.get("message").toString());
-			auditLog.setModule(jsonObject.get("module").toString());
-			auditLog.setUser(jsonObject.get("user").toString());
-			auditLog.setStatus(jsonObject.get("status").toString());
-			auditLog.setTime(Long.parseLong(jsonObject.get("time").toString()));
+			return jsonObject;
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		logger.error("{}",auditLog);
+		return null;
+	}
+	
+	private AuditLog getLog(JSONObject jsonObject){
+		AuditLog auditLog = new AuditLog();
+		auditLog.setBranch(jsonObject.get("branch").toString());
+		auditLog.setMessage(jsonObject.get("message").toString());
+		auditLog.setModule(jsonObject.get("module").toString());
+		auditLog.setUser(jsonObject.get("user").toString());
+		auditLog.setStatus(jsonObject.get("status").toString());
+		auditLog.setTime(Long.parseLong(jsonObject.get("time").toString()));
 		return auditLog;
-
 	}
 	/*
 	public static void main(String args[]){

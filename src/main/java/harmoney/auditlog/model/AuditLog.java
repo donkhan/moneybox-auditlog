@@ -2,9 +2,6 @@ package harmoney.auditlog.model;
 
 import harmoney.auditlog.server.LogInserter;
 
-import java.util.StringTokenizer;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
