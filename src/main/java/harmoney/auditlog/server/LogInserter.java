@@ -37,14 +37,14 @@ public class LogInserter extends Thread implements Runnable{
 				}
 			}else{
 				JSONObject jsonContent = getJSONObject(messageList.remove(0).trim());
-				if(jsonContent.get("message-type").toString().equals("LOG")){
+				if(jsonContent.get("messageType").toString().equals("LOG")){
 					logger.info("Log Message");
 					repo.save(getLog(jsonContent));
 				}
-				if(jsonContent.get("message-type").toString().equals("LOG IN")){
+				if(jsonContent.get("messageType").toString().equals("LOG IN")){
 					addToWhiteList(jsonContent);
 				}
-				if(jsonContent.get("message-type").toString().equals("LOG OUT")){
+				if(jsonContent.get("messageType").toString().equals("LOG OUT")){
 					blackList(jsonContent);
 				}
 			}
@@ -55,16 +55,17 @@ public class LogInserter extends Thread implements Runnable{
 		LoggedInUser lu = new LoggedInUser();
 		lu.setBranchName((String)jsonContent.get("branch"));
 		lu.setName((String)jsonContent.get("user"));
-		String sessionId = (String)jsonContent.get("session-id");
+		String sessionId = lu.getName();
 		SessionMap.getSessionMap().put(sessionId, lu);
 	}
 	
 	private void blackList(JSONObject jsonContent) {
-		String sessionId = (String)jsonContent.get("session-id");
+		String sessionId = (String)jsonContent.get("user");
 		SessionMap.getSessionMap().remove(sessionId);
 	}
 
 	private JSONObject getJSONObject(String message){
+		logger.info("Message {}",message);
 		try {
 			JSONObject jsonObject = (JSONObject)parser.parse(message);
 			return jsonObject;
