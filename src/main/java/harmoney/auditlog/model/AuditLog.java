@@ -2,9 +2,6 @@ package harmoney.auditlog.model;
 
 import harmoney.auditlog.server.LogInserter;
 
-import java.util.StringTokenizer;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
@@ -86,28 +83,5 @@ public class AuditLog {
 	
 	final static Logger logger = LoggerFactory.getLogger(LogInserter.class);
 	
-	public static AuditLog getLog(String message){
-		logger.info("Going to Log {} ",message);
-		AuditLog al = new AuditLog();
-		al.setId(UUID.randomUUID().toString());
-		StringTokenizer tokenizer = new StringTokenizer(message,":");
-		al.setTime(Long.parseLong(getNextToken(tokenizer,Long.class)));
-		al.setUser(getNextToken(tokenizer,String.class));
-		al.setBranch(getNextToken(tokenizer,String.class));
-		al.setModule(getNextToken(tokenizer,String.class));
-		al.setMessage(getNextToken(tokenizer,String.class));
-		al.setStatus(getNextToken(tokenizer,String.class));
-		return al;
-	}
 	
-	private static String getNextToken(StringTokenizer tokenizer, Object dataType){
-		if(tokenizer.hasMoreTokens()){
-			return tokenizer.nextToken();
-		}
-		if(dataType.equals(Long.class) || dataType.equals(Integer.class)){
-			return "0";
-		}
-		return "";
-		
-	}
 }

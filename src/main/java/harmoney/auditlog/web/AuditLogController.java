@@ -1,7 +1,9 @@
 package harmoney.auditlog.web;
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.LoggedInUser;
 import harmoney.auditlog.model.Page;
+import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
@@ -46,18 +48,17 @@ public class AuditLogController {
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
     	logger.info("Get Audig Logs called");
-    	String requesterBranchName = request.getParameter("requester-branch");
-    	String requesterName = request.getParameter("requester-name");
-    	if(requesterName == null || requesterBranchName == null){
-    		logger.error("Unable to serve as requester's name {} and branch Name {} ",requesterName,requesterBranchName );
+
+    	String sessionId = request.getHeader("x-userid");
+    	SessionMap sessionMap = SessionMap.getSessionMap();
+    	if(!sessionMap.containsKey(sessionId)){
+    		logger.error("Unable to serve as session id {} is not present in Audit Log db",sessionId);
     		return Response.serverError().build();
     	}
-    	String message = System.currentTimeMillis() + ":" + requesterName + ":" 
-    			+ requesterBranchName + ":" + "AUDITLOG" + ":Retrieved Audit Logs:" + "SUCCESS";
-    	AuditLog auditLog = AuditLog.getLog(message);
+
+    	LoggedInUser user = sessionMap.get(sessionId);
+    	log(user);
     	Query query = getQuery(request);
-    	auditLogRepository.save(auditLog);
-    	
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
     	Page page = createPage(count,result);
@@ -67,7 +68,18 @@ public class AuditLogController {
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
     }
     
-    private Page createPage(long total,List<AuditLog> result){
+    private void log(LoggedInUser user) {
+    	AuditLog auditLog = new AuditLog();
+    	auditLog.setBranch(user.getBranchName());
+    	auditLog.setUser(user.getName());
+    	auditLog.setTime(System.currentTimeMillis());
+    	auditLog.setModule("AUDIT LOG");
+    	auditLog.setStatus("SUCCESS");
+    	auditLog.setMessage("Retrieved Audit Logs");
+    	auditLogRepository.save(auditLog);
+	}
+
+	private Page createPage(long total,List<AuditLog> result){
     	Page page = new Page();
     	page.setTotal(total);
     	page.setContent(result);
@@ -81,8 +93,8 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	logger.trace("From {} To {}", from , to);
-    	logger.trace("User {} Branch {} ", user, branchName);
+    	logger.info("From {} To {}", from , to);
+    	logger.info("User {} Branch {} ", user, branchName);
     	
     	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
     		logger.trace("Specific User and Specific Branch Case (teller)");

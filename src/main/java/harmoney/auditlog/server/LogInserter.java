@@ -1,10 +1,15 @@
 package harmoney.auditlog.server;
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.LoggedInUser;
+import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +24,7 @@ public class LogInserter extends Thread implements Runnable{
 		this.messageList = messageList;
 	}
 	
+	private JSONParser parser = new JSONParser();
 	@Override
 	public void run() {
 		while(true){
@@ -30,9 +36,60 @@ public class LogInserter extends Thread implements Runnable{
 					logger.error("Error {}",e);
 				}
 			}else{
-				repo.save(AuditLog.getLog((messageList.remove(0))));
+				JSONObject jsonContent = getJSONObject(messageList.remove(0).trim());
+				if(jsonContent.get("messageType").toString().equals("LOG")){
+					logger.info("Log Message");
+					repo.save(getLog(jsonContent));
+				}
+				if(jsonContent.get("messageType").toString().equals("LOG IN")){
+					addToWhiteList(jsonContent);
+				}
+				if(jsonContent.get("messageType").toString().equals("LOG OUT")){
+					blackList(jsonContent);
+				}
 			}
 		}
 	} 
 	
+	private void addToWhiteList(JSONObject jsonContent) {
+		LoggedInUser lu = new LoggedInUser();
+		lu.setBranchName((String)jsonContent.get("branch"));
+		lu.setName((String)jsonContent.get("user"));
+		String sessionId = lu.getName();
+		SessionMap.getSessionMap().put(sessionId, lu);
+	}
+	
+	private void blackList(JSONObject jsonContent) {
+		String sessionId = (String)jsonContent.get("user");
+		SessionMap.getSessionMap().remove(sessionId);
+	}
+
+	private JSONObject getJSONObject(String message){
+		logger.info("Message {}",message);
+		try {
+			JSONObject jsonObject = (JSONObject)parser.parse(message);
+			return jsonObject;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private AuditLog getLog(JSONObject jsonObject){
+		AuditLog auditLog = new AuditLog();
+		auditLog.setBranch(jsonObject.get("branch").toString());
+		auditLog.setMessage(jsonObject.get("message").toString());
+		auditLog.setModule(jsonObject.get("module").toString());
+		auditLog.setUser(jsonObject.get("user").toString());
+		auditLog.setStatus(jsonObject.get("status").toString());
+		auditLog.setTime(Long.parseLong(jsonObject.get("time").toString()));
+		return auditLog;
+	}
+	/*
+	public static void main(String args[]){
+		String message = "{\"module\":\"TELLERTRANSFER\",\"time\":1462950297064,\"status\":\"SUCCESS\",\"branch\":\"MADURAI\",\"user\":\"KHAN\",\"message\":\" Junk TELLERTRANSFER\"}";
+		LogInserter li = new LogInserter(null,null);
+		AuditLog log = li.getLog(message);
+	}
+	*/
 }

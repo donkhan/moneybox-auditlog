@@ -29,7 +29,7 @@ public class AuditServer {
 				DatagramPacket packet = new DatagramPacket(	new byte[PACKETSIZE], PACKETSIZE);
 				socket.receive(packet);
 				String data = new String(packet.getData());
-				messageList.add(data.trim());
+				messageList.add(data);
 			}
 		} catch (Exception e) {
 			logger.error("",e);
