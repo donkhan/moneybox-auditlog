@@ -6,7 +6,6 @@ import harmoney.auditlog.model.Page;
 import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +55,7 @@ public class AuditLogController {
     		logger.error("Unable to serve as session id {} is not present in Audit Log db",sessionId);
     		return Response.serverError().build();
     	}
+
     	LoggedInUser user = sessionMap.get(sessionId);
     	log(user);
     	Query query = getQuery(request);
