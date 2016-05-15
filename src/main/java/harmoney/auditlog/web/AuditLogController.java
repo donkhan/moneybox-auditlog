@@ -6,6 +6,7 @@ import harmoney.auditlog.model.Page;
 import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,16 +48,14 @@ public class AuditLogController {
     @RequestMapping("/get-audit-logs")
     @CrossOrigin
     public Response getAuditLogs(HttpServletRequest request){
-    	logger.info("Get Audig Logs called");
-
-    	String sessionId = request.getHeader("x-userid");
+    	logger.info("Get Audit Logs called");
+    	String  token = request.getParameter("token");
     	SessionMap sessionMap = SessionMap.getSessionMap();
-    	if(!sessionMap.containsKey(sessionId)){
-    		logger.error("Unable to serve as session id {} is not present in Audit Log db",sessionId);
+    	if(!sessionMap.containsKey(token)){
+    		logger.error("Unable to serve as token {} is not present in Audit Log db",token);
     		return Response.serverError().build();
     	}
-
-    	LoggedInUser user = sessionMap.get(sessionId);
+    	LoggedInUser user = sessionMap.get(token);
     	log(user);
     	Query query = getQuery(request);
     	long count = mongoTemplate.count(query, AuditLog.class);
@@ -65,7 +64,8 @@ public class AuditLogController {
     	
     	logger.info("No of Entries {} " ,count);
     	return Response.ok().entity(page).header("Access-Control-Allow-Origin", "*")
-    			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
+    			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+    			.header("Access-Control-Allow-Headers", "x-userid").build();
     }
     
     private void log(LoggedInUser user) {

@@ -2,6 +2,7 @@ package harmoney.auditlog;
 
 import harmoney.auditlog.repository.AuditLogRepository;
 import harmoney.auditlog.server.AuditServer;
+import harmoney.auditlog.server.RegistrationServer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,8 +22,10 @@ public class App implements CommandLineRunner{
     
     @Override
 	public void run(String... args) throws Exception {
-    	AuditServer server = new AuditServer();
-    	server.start(5678,auditLogRepository);
+    	Thread server = new AuditServer(5678,auditLogRepository);
+    	server.start();
+    	RegistrationServer registrationServer = new RegistrationServer();
+    	registrationServer.start(5677);
     }
     
     

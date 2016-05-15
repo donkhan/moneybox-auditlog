@@ -1,8 +1,6 @@
 package harmoney.auditlog.server;
 
 import harmoney.auditlog.model.AuditLog;
-import harmoney.auditlog.model.LoggedInUser;
-import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
 
 import java.util.List;
@@ -37,32 +35,13 @@ public class LogInserter extends Thread implements Runnable{
 				}
 			}else{
 				JSONObject jsonContent = getJSONObject(messageList.remove(0).trim());
-				if(jsonContent.get("messageType").toString().equals("LOG")){
-					logger.info("Log Message");
-					repo.save(getLog(jsonContent));
-				}
-				if(jsonContent.get("messageType").toString().equals("LOG IN")){
-					addToWhiteList(jsonContent);
-				}
-				if(jsonContent.get("messageType").toString().equals("LOG OUT")){
-					blackList(jsonContent);
-				}
+				logger.info("Log Message");
+				repo.save(getLog(jsonContent));
 			}
 		}
 	} 
 	
-	private void addToWhiteList(JSONObject jsonContent) {
-		LoggedInUser lu = new LoggedInUser();
-		lu.setBranchName((String)jsonContent.get("branch"));
-		lu.setName((String)jsonContent.get("user"));
-		String sessionId = lu.getName();
-		SessionMap.getSessionMap().put(sessionId, lu);
-	}
-	
-	private void blackList(JSONObject jsonContent) {
-		String sessionId = (String)jsonContent.get("user");
-		SessionMap.getSessionMap().remove(sessionId);
-	}
+
 
 	private JSONObject getJSONObject(String message){
 		logger.info("Message {}",message);

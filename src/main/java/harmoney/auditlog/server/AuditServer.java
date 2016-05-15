@@ -10,14 +10,21 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuditServer {
+public class AuditServer extends Thread{
 	private final static int PACKETSIZE = 1000;
 	
 	final Logger logger = LoggerFactory.getLogger(AuditServer.class);
 	private List<String> messageList = new Vector<String>();
+	private AuditLogRepository auditLogRepo;
+	private int port;
 	
-	public void start(int port,AuditLogRepository auditLogRepo) {
-		
+	public AuditServer(int port,AuditLogRepository auditLogRepo) {
+		this.port = port;
+		this.auditLogRepo = auditLogRepo;
+	}
+	
+	@Override
+	public void run() {
 		LogInserter li = new LogInserter(auditLogRepo,messageList);
 		li.start();
 		
@@ -34,5 +41,6 @@ public class AuditServer {
 		} catch (Exception e) {
 			logger.error("",e);
 		}
+		
 	}
 }
