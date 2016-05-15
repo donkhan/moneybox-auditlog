@@ -28,9 +28,7 @@ public class RegistrationServer {
 				DatagramPacket packet = new DatagramPacket(	new byte[PACKETSIZE], PACKETSIZE);
 				socket.receive(packet);
 				String data = new String(packet.getData());
-				//logger.info("Registration Request {}",data);
 				JSONObject jsonContent = getJSONObject(data.trim());
-				//logger.info("{}",jsonContent.toJSONString());
 				LoggedInUser u = new LoggedInUser();
 				u.setName((String)jsonContent.get("id"));
 				u.setRole((String)jsonContent.get("roleId"));
