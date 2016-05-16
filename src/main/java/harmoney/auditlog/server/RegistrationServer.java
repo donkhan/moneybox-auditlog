@@ -1,6 +1,5 @@
 package harmoney.auditlog.server;
 
-import harmoney.auditlog.model.LoggedInUser;
 import harmoney.auditlog.model.SessionMap;
 
 import java.net.DatagramPacket;
@@ -29,18 +28,12 @@ public class RegistrationServer {
 				socket.receive(packet);
 				String data = new String(packet.getData());
 				JSONObject jsonContent = getJSONObject(data.trim());
-				LoggedInUser u = new LoggedInUser();
-				u.setName((String)jsonContent.get("id"));
-				u.setRole((String)jsonContent.get("roleId"));
-				JSONObject branch = (JSONObject)jsonContent.get("branch");
-				u.setBranchName((String)branch.get("name"));
-				
-				logger.info("{}",u);
+				logger.info("{}",jsonContent);
 				
 				InetAddress IPAddress = packet.getAddress();
                 int receivedPort = packet.getPort();
                 String token = UUID.randomUUID().toString();
-                SessionMap.getSessionMap().put(token,u);
+                SessionMap.getSessionMap().put(token,jsonContent);
                 DatagramPacket sendPacket =  new DatagramPacket(token.getBytes(), token.getBytes().length,
                 		IPAddress, receivedPort);
                 socket.send(sendPacket);

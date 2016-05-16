@@ -3,7 +3,9 @@ package harmoney.auditlog.model;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SessionMap extends HashMap<String,LoggedInUser> {
+import org.json.simple.JSONObject;
+
+public class SessionMap extends HashMap<String,JSONObject> {
 	
 	private static final long serialVersionUID = 1L;
 	private static SessionMap sessionMap;
@@ -19,12 +21,13 @@ public class SessionMap extends HashMap<String,LoggedInUser> {
 		return sessionMap;
 	}
 	
-	public LoggedInUser put(String sessionId,LoggedInUser u){
-		if(reverseMap.containsKey(u.getName())){
-			String id = reverseMap.get(u.getName());
+	public JSONObject put(String sessionId,JSONObject jsonContent){
+		String name = (String)jsonContent.get("id");
+		if(reverseMap.containsKey(name)){
+			String id = reverseMap.get(name);
 			remove(id);
 		}
-		reverseMap.put(u.getName(),sessionId);
-		return super.put(sessionId,u);
+		reverseMap.put(name,sessionId);
+		return super.put(sessionId,jsonContent);
 	}
 }
