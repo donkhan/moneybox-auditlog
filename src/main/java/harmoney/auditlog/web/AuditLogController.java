@@ -64,7 +64,7 @@ public class AuditLogController {
     	logger.info("No of Entries {} " ,count);
     	return Response.ok().entity(page).header("Access-Control-Allow-Origin", "*")
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
-    			.header("Access-Control-Allow-Headers", "x-userid").build();
+    			.build();
     }
     
     private void log(JSONObject user) {
