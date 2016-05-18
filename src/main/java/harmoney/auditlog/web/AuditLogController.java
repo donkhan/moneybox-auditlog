@@ -75,7 +75,7 @@ public class AuditLogController {
     	auditLog.setTime(System.currentTimeMillis());
     	auditLog.setModule("AUDIT LOG");
     	auditLog.setStatus("SUCCESS");
-    	auditLog.setMessage("Retrieved Audit Logs");
+    	auditLog.setMessage("Retrieve Audit Logs");
     	auditLogRepository.save(auditLog);
 	}
 
