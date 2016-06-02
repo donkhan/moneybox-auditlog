@@ -25,7 +25,7 @@ public class App implements CommandLineRunner{
     	Thread server = new AuditServer(5678,auditLogRepository);
     	server.start();
     	RegistrationServer registrationServer = new RegistrationServer();
-    	registrationServer.start(5677);
+    	registrationServer.start();
     }
     
     
