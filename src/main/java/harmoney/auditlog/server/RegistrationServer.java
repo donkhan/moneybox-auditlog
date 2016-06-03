@@ -1,5 +1,6 @@
 package harmoney.auditlog.server;
 
+import harmoney.auditlog.model.Configuration;
 import harmoney.auditlog.model.SessionMap;
 
 import java.net.DatagramPacket;
@@ -19,12 +20,15 @@ public class RegistrationServer {
 	final Logger logger = LoggerFactory.getLogger(RegistrationServer.class);
 	private JSONParser parser = new JSONParser();
 	
-	private static int PORT = 3332;
-	
+	private Configuration c;
+	public RegistrationServer(Configuration c) {
+		this.c = c;
+	}
+
 	public void start() {
 		try {
-			DatagramSocket socket = new DatagramSocket(PORT);
-			logger.info("Registration Server is ready and listening in port " + PORT);
+			DatagramSocket socket = new DatagramSocket(c.getRegistrationServerPort());
+			logger.info("Registration Server is ready and listening in port " + c.getRegistrationServerPort());
 			for (;;) {
 				DatagramPacket packet = new DatagramPacket(	new byte[PACKETSIZE], PACKETSIZE);
 				socket.receive(packet);

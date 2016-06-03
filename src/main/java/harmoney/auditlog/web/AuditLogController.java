@@ -1,12 +1,15 @@
 package harmoney.auditlog.web;
 
 import harmoney.auditlog.model.AuditLog;
+import harmoney.auditlog.model.Configuration;
 import harmoney.auditlog.model.Page;
 import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.AuditLogRepository;
+import harmoney.auditlog.repository.ConfigurationRepository;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
@@ -22,7 +25,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -121,5 +126,25 @@ public class AuditLogController {
     	return query;
     }
     
+
+    @Resource
+    private ConfigurationRepository configurationRepository;
     
+    @RequestMapping(value = "/update-configuration", method = RequestMethod.POST, 
+			headers = "Accept=application/json", 
+    		produces = "application/json")
+	@CrossOrigin
+	public Response updateConfiguration(@RequestBody final Configuration configuration,
+			HttpServletRequest request) {
+    	String  token = request.getParameter("token");
+    	SessionMap sessionMap = SessionMap.getSessionMap();
+    	if(!sessionMap.containsKey(token)){
+    		logger.error("Unable to serve as token {} is not present in Audit Log db",token);
+    		return Response.serverError().build();
+    	}
+		configurationRepository.deleteAll();
+		configurationRepository.save(configuration);
+		return Response.ok().header("Access-Control-Allow-Origin", "*")
+    			.header("Access-Control-Allow-Methods", "POST").build();
+	}
 }
