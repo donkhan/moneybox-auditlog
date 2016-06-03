@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +58,6 @@ public class AuditLogController {
     		logger.error("Unable to serve as token {} is not present in Audit Log db",token);
     		return Response.serverError().build();
     	}
-    	//JSONObject user = sessionMap.get(token);
-    	//log(user);
     	Query query = getQuery(request);
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
@@ -72,17 +69,7 @@ public class AuditLogController {
     			.build();
     }
     
-    private void log(JSONObject user) {
-    	AuditLog auditLog = new AuditLog();
-    	JSONObject branch = (JSONObject)user.get("branch");
-    	auditLog.setBranch((String)branch.get("name"));
-    	auditLog.setUser((String)user.get("id"));
-    	auditLog.setTime(System.currentTimeMillis());
-    	auditLog.setModule("AUDIT LOG");
-    	auditLog.setStatus("SUCCESS");
-    	auditLog.setMessage("Retrieve Audit Logs");
-    	auditLogRepository.save(auditLog);
-	}
+    
 
 	private Page createPage(long total,List<AuditLog> result){
     	Page page = new Page();
