@@ -17,5 +17,7 @@ public class Configuration {
 		this.registrationServerPort = registrationServerPort;
 	}
 	
-	
+	public String toString(){
+		return "Registration Port " + registrationServerPort + " Audit Port " + auditServerPort;
+	}
 }

@@ -35,7 +35,6 @@ public class LogInserter extends Thread implements Runnable{
 				}
 			}else{
 				JSONObject jsonContent = getJSONObject(messageList.remove(0).trim());
-				logger.info("Log Message");
 				repo.save(getLog(jsonContent));
 			}
 		}
@@ -44,7 +43,6 @@ public class LogInserter extends Thread implements Runnable{
 
 
 	private JSONObject getJSONObject(String message){
-		logger.info("Message {}",message);
 		try {
 			JSONObject jsonObject = (JSONObject)parser.parse(message);
 			return jsonObject;

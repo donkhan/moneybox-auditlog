@@ -34,12 +34,11 @@ public class RegistrationServer {
 				socket.receive(packet);
 				String data = new String(packet.getData());
 				JSONObject jsonContent = getJSONObject(data.trim());
-				logger.info("{}",jsonContent);
-				
 				InetAddress IPAddress = packet.getAddress();
                 int receivedPort = packet.getPort();
                 String token = UUID.randomUUID().toString();
                 SessionMap.getSessionMap().put(token,jsonContent);
+                logger.info("Token {} is assigned for {}",token,jsonContent.get("id"));
                 DatagramPacket sendPacket =  new DatagramPacket(token.getBytes(), token.getBytes().length,
                 		IPAddress, receivedPort);
                 socket.send(sendPacket);
@@ -51,7 +50,6 @@ public class RegistrationServer {
 	}
 	
 	private JSONObject getJSONObject(String message){
-		logger.info("Message {}",message);
 		try {
 			JSONObject jsonObject = (JSONObject)parser.parse(message);
 			return jsonObject;

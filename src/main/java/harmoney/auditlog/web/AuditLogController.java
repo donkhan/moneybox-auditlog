@@ -59,8 +59,8 @@ public class AuditLogController {
     		logger.error("Unable to serve as token {} is not present in Audit Log db",token);
     		return Response.serverError().build();
     	}
-    	JSONObject user = sessionMap.get(token);
-    	log(user);
+    	//JSONObject user = sessionMap.get(token);
+    	//log(user);
     	Query query = getQuery(request);
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
@@ -101,18 +101,7 @@ public class AuditLogController {
     	logger.info("From {} To {}", from , to);
     	logger.info("User {} Branch {} ", user, branchName);
     	
-    	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
-    		logger.trace("Specific User and Specific Branch Case (teller)");
-    		Criteria b = Criteria.where("branch").is(branchName).andOperator(Criteria.where("user").is(user));
-    		c.andOperator(b);
-    	}
-    	else if(!"ALL".equals(branchName)){
-    		logger.trace("Specific Branch Case (manager)");
-    		Criteria u = Criteria.where("branch").is(branchName);
-    		c.andOperator(u);
-    	}else{
-    		logger.trace("All Case (sadmin)");
-    	}
+    	addBranchUserCriteria(c,branchName,user);
     	query.addCriteria(c);
     	query.with(new Sort(new Order(Direction.DESC, "time")));
     	
@@ -127,7 +116,33 @@ public class AuditLogController {
     }
     
 
-    @Resource
+    private void addBranchUserCriteria(Criteria c, String branchName,
+			String user) {
+    	if(!"ALL".equals(branchName) && !"ALL".equals(user)){
+    		logger.info("User {} in  Branch {} ",user,branchName);
+    		Criteria b = Criteria.where("branch").is(branchName).andOperator(Criteria.where("user").is(user));
+    		c.andOperator(b);
+    		return;
+    	}
+    	
+    	if(!"ALL".equals(branchName) && "ALL".equals(user)){
+    		logger.info("All users in branch {} ",branchName);
+    		Criteria u = Criteria.where("branch").is(branchName);
+    		c.andOperator(u);
+    	}
+    	
+    	if(!"ALL".equals(user)  && "ALL".equals(branchName)){
+    		logger.info("User {} in all Branches ",user);
+    		Criteria u = Criteria.where("user").is(user);
+    		c.andOperator(u);
+    	}
+    	
+    	logger.info("All Users in All Branches");
+		
+	}
+
+
+	@Resource
     private ConfigurationRepository configurationRepository;
     
     @RequestMapping(value = "/update-configuration", method = RequestMethod.POST, 
@@ -136,6 +151,7 @@ public class AuditLogController {
 	@CrossOrigin
 	public Response updateConfiguration(@RequestBody final Configuration configuration,
 			HttpServletRequest request) {
+    	logger.info("Request received to update audit server configuration {} ", configuration);
     	String  token = request.getParameter("token");
     	SessionMap sessionMap = SessionMap.getSessionMap();
     	if(!sessionMap.containsKey(token)){
