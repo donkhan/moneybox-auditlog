@@ -4,7 +4,6 @@ import harmoney.auditlog.model.AuditLog;
 import harmoney.auditlog.model.Configuration;
 import harmoney.auditlog.model.Page;
 import harmoney.auditlog.model.SessionMap;
-import harmoney.auditlog.repository.AuditLogRepository;
 import harmoney.auditlog.repository.ConfigurationRepository;
 
 import java.util.List;
@@ -43,9 +42,6 @@ public class AuditLogController {
     
     
     @Autowired
-	private AuditLogRepository auditLogRepository;
-    
-    @Autowired
     private MongoTemplate mongoTemplate;
     
     @RequestMapping("/get-audit-logs")
@@ -55,7 +51,7 @@ public class AuditLogController {
     	String  token = request.getParameter("token");
     	SessionMap sessionMap = SessionMap.getSessionMap();
     	if(!sessionMap.containsKey(token)){
-    		logger.error("Unable to serve as token {} is not present in Audit Log db",token);
+    		logger.error("Unable to serve as token {} is not present in the session",token);
     		return Response.serverError().build();
     	}
     	Query query = getQuery(request);
