@@ -3,8 +3,8 @@ package harmoney.auditlog.web;
 import harmoney.auditlog.model.AuditLog;
 import harmoney.auditlog.model.Configuration;
 import harmoney.auditlog.model.Page;
-import harmoney.auditlog.model.SessionMap;
 import harmoney.auditlog.repository.ConfigurationRepository;
+import harmoney.model.SessionMap;
 
 import java.util.List;
 

@@ -4,7 +4,7 @@ import harmoney.auditlog.model.Configuration;
 import harmoney.auditlog.repository.AuditLogRepository;
 import harmoney.auditlog.repository.ConfigurationRepository;
 import harmoney.auditlog.server.AuditServer;
-import harmoney.auditlog.server.RegistrationServer;
+import harmoney.server.RegistrationServer;
 
 import java.util.List;
 
@@ -50,7 +50,8 @@ public class App implements CommandLineRunner{
     	Configuration c = getAppConfiguration();
     	Thread server = new AuditServer(c.getAuditServerPort(),auditLogRepository);
     	server.start();
-    	RegistrationServer registrationServer = new RegistrationServer(c);
+    	RegistrationServer registrationServer = new RegistrationServer();
+    	registrationServer.setPort(c.getRegistrationServerPort());
     	registrationServer.start();
     }
     
