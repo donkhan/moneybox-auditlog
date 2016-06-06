@@ -11,4 +11,4 @@ install mongo db https://docs.mongodb.com/manual/tutorial/install-mongodb-on-win
 
 run mongo db. mongod -dbpath dbfolder
 
-java -jar target/auditlog-0.0.1-SNAPSHOT.jar
+java -jar target/auditlog-0.1.jar
