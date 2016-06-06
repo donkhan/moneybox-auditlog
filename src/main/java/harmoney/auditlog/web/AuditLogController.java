@@ -54,6 +54,8 @@ public class AuditLogController {
     		logger.error("Unable to serve as token {} is not present in the session",token);
     		return Response.serverError().build();
     	}
+    	String userId = (String)sessionMap.get(token).get("id");
+    	logger.info("User {} requested ",userId);
     	Query query = getQuery(request);
     	long count = mongoTemplate.count(query, AuditLog.class);
     	List<AuditLog> result = mongoTemplate.find(query, AuditLog.class);
