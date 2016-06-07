@@ -48,11 +48,12 @@ public class App implements CommandLineRunner{
 	public void run(String... args) throws Exception {
     	logger.info("Configuration Repository {}",configurationRepository);
     	Configuration c = getAppConfiguration();
-    	Thread server = new AuditServer(c.getAuditServerPort(),auditLogRepository);
+    	AuditServer server = new AuditServer(c.getAuditServerPort(),auditLogRepository);
     	server.start();
     	RegistrationServer registrationServer = new RegistrationServer();
     	registrationServer.setPort(c.getRegistrationServerPort());
     	registrationServer.start();
+    	logger.info("Registration Server is running in Separate thread");
     }
     
     

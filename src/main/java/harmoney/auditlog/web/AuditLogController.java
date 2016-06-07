@@ -6,6 +6,7 @@ import harmoney.auditlog.model.Page;
 import harmoney.auditlog.repository.ConfigurationRepository;
 import harmoney.model.SessionMap;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -40,7 +41,7 @@ public class AuditLogController {
     			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT").build();
     }
     
-    
+   
     @Autowired
     private MongoTemplate mongoTemplate;
     
@@ -83,7 +84,7 @@ public class AuditLogController {
     	long to = Long.parseLong(request.getParameter("to"));
     	String user = request.getParameter("user");
     	Criteria c = Criteria.where("time").gte(from).lte(to);
-    	logger.info("From {} To {}", from , to);
+    	logger.info("From {} To {}", new Date(from) , new Date(to));
     	logger.info("User {} Branch {} ", user, branchName);
     	
     	addBranchUserCriteria(c,branchName,user);

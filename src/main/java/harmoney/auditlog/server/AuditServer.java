@@ -10,7 +10,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuditServer extends Thread{
+public class AuditServer extends Thread implements Runnable{
 	private final static int PACKETSIZE = 1000;
 	
 	final Logger logger = LoggerFactory.getLogger(AuditServer.class);
