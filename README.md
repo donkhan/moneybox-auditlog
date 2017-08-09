@@ -9,6 +9,6 @@ mvn clean package
 
 install mongo db https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
-run mongo db. mongod -dbpath dbfolder
+ mongod -dbpath dbfolder
 
 java -jar target/auditlog-0.1.jar
